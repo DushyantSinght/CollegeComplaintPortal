@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://complaint-portal-backend.vercel.app/api'
+  apiUrl: 'https://college-complaint-portal-one.vercel.app/'
 };
