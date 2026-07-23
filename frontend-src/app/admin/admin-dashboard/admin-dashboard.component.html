@@ -1,0 +1,189 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>Admin Dashboard</h2>
+      <p class="page-subtitle">Review complaints and monitor portal activity</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="activeTab === 'complaints'"
+      (click)="setTab('complaints')"
+    >
+      Complaints
+    </button>
+    <button
+      type="button"
+      class="tab-button"
+      [class.active]="activeTab === 'analytics'"
+      (click)="setTab('analytics')"
+    >
+      Analytics
+    </button>
+  </div>
+
+  <!-- Complaints tab -->
+  <section *ngIf="activeTab === 'complaints'">
+    <div class="filter-bar filter-bar-row">
+      <div>
+        <label for="statusFilter">Status</label>
+        <select id="statusFilter" [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()" class="form-control">
+          <option value="">All</option>
+          <option value="pending">Pending</option>
+          <option value="in-progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+        </select>
+      </div>
+      <div>
+        <label for="priorityFilter">Priority</label>
+        <select
+          id="priorityFilter"
+          [(ngModel)]="priorityFilter"
+          (ngModelChange)="onFilterChange()"
+          class="form-control"
+        >
+          <option value="">All</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="urgent">Urgent</option>
+        </select>
+      </div>
+    </div>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+
+    <div class="loading-state" *ngIf="loading">Loading complaints...</div>
+
+    <div class="empty-state" *ngIf="!loading && complaints.length === 0">
+      <p>No complaints found.</p>
+    </div>
+
+    <div class="complaint-cards" *ngIf="!loading && complaints.length > 0">
+      <article class="complaint-card" *ngFor="let c of complaints">
+        <div class="complaint-card-header">
+          <div>
+            <h4>{{ c.title }}</h4>
+            <p class="muted">{{ c.description }}</p>
+          </div>
+          <div class="badge-stack">
+            <span [class]="statusClass(c.status)">{{ c.status }}</span>
+            <span [class]="priorityClass(c.priority)">{{ c.priority }}</span>
+          </div>
+        </div>
+
+        <div class="complaint-meta">
+          <span><strong>Student:</strong> {{ studentName(c) }}</span>
+          <span class="meta-tag">{{ c.category }}</span>
+        </div>
+
+        <div class="complaint-footer">
+          <div class="remarks-field">
+            <label [for]="'remarks-' + c._id">Admin remarks</label>
+            <input
+              [id]="'remarks-' + c._id"
+              type="text"
+              class="form-control"
+              [ngModel]="c.adminRemarks"
+              (ngModelChange)="remarksDraft[c._id] = $event"
+              placeholder="Add remarks..."
+            />
+          </div>
+          <div class="priority-control">
+            <label [for]="'priority-' + c._id">Priority</label>
+            <select
+              [id]="'priority-' + c._id"
+              class="form-control"
+              [ngModel]="c.priority"
+              (ngModelChange)="updatePriority(c, $event)"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+          <div class="status-buttons">
+            <button
+              class="btn-sm btn-ghost"
+              [class.active]="c.status === 'pending'"
+              (click)="updateStatus(c, 'pending')"
+              [disabled]="c.status === 'pending'"
+            >
+              Pending
+            </button>
+            <button
+              class="btn-sm btn-ghost"
+              [class.active]="c.status === 'in-progress'"
+              (click)="updateStatus(c, 'in-progress')"
+              [disabled]="c.status === 'in-progress'"
+            >
+              In Progress
+            </button>
+            <button
+              class="btn-sm btn-ghost"
+              [class.active]="c.status === 'resolved'"
+              (click)="updateStatus(c, 'resolved')"
+              [disabled]="c.status === 'resolved'"
+            >
+              Resolved
+            </button>
+          </div>
+        </div>
+
+        <div class="complaint-footer">
+          <button type="button" class="btn-sm btn-ghost" (click)="toggleThread(c._id)">
+            {{ expandedId === c._id ? 'Hide discussion' : 'Discussion' }} ({{ c.comments.length }})
+          </button>
+        </div>
+
+        <div class="thread-wrapper" *ngIf="expandedId === c._id">
+          <app-comment-thread
+            [comments]="c.comments"
+            [posting]="postingId === c._id"
+            (addComment)="onAddComment(c, $event)"
+          ></app-comment-thread>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Analytics tab -->
+  <section class="analytics-section" *ngIf="activeTab === 'analytics'">
+    <p class="error" *ngIf="statsError">{{ statsError }}</p>
+    <div class="loading-state" *ngIf="statsLoading">Loading analytics...</div>
+
+    <ng-container *ngIf="!statsLoading && stats as s">
+      <div class="stat-cards-row">
+        <app-stat-card [value]="s.total" label="Total Complaints"></app-stat-card>
+        <app-stat-card [value]="s.byStatus.pending" label="Pending"></app-stat-card>
+        <app-stat-card [value]="s.byStatus['in-progress']" label="In Progress"></app-stat-card>
+        <app-stat-card [value]="s.byStatus.resolved" label="Resolved"></app-stat-card>
+        <app-stat-card [value]="s.resolutionRate + '%'" label="Resolution Rate"></app-stat-card>
+        <app-stat-card [value]="s.avgResolutionDays ?? '—'" label="Avg Days to Resolve"></app-stat-card>
+      </div>
+
+      <div class="chart-grid">
+        <div class="card chart-card">
+          <h3>By Status</h3>
+          <app-donut-chart [data]="statusChartData(s)"></app-donut-chart>
+        </div>
+        <div class="card chart-card">
+          <h3>By Category</h3>
+          <app-bar-chart [data]="categoryChartData(s)"></app-bar-chart>
+        </div>
+        <div class="card chart-card">
+          <h3>By Priority</h3>
+          <app-bar-chart [data]="priorityChartData(s)"></app-bar-chart>
+        </div>
+        <div class="card chart-card chart-card-wide">
+          <h3>Weekly Trend (last 8 weeks)</h3>
+          <app-bar-chart [data]="trendChartData(s)"></app-bar-chart>
+        </div>
+      </div>
+    </ng-container>
+  </section>
+</div>

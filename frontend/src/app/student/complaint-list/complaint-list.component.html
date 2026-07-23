@@ -1,0 +1,50 @@
+<div class="card">
+  <h3>My Complaints</h3>
+
+  <p class="error" *ngIf="error">{{ error }}</p>
+
+  <div class="loading-state" *ngIf="loading">Loading your complaints...</div>
+
+  <div class="empty-state" *ngIf="!loading && complaints.length === 0">
+    <p>No complaints filed yet. Submit one above to get started.</p>
+  </div>
+
+  <div class="complaint-cards" *ngIf="!loading && complaints.length > 0">
+    <article class="complaint-card" *ngFor="let c of complaints">
+      <div class="complaint-card-header">
+        <div>
+          <h4>{{ c.title }}</h4>
+          <p class="muted">{{ c.description }}</p>
+        </div>
+        <div class="badge-stack">
+          <span [class]="statusClass(c.status)">{{ c.status }}</span>
+          <span [class]="priorityClass(c.priority)">{{ c.priority }}</span>
+        </div>
+      </div>
+
+      <div class="complaint-meta">
+        <span class="meta-tag">{{ c.category }}</span>
+        <span>Filed {{ c.createdAt | date: 'mediumDate' }}</span>
+        <span *ngIf="c.adminRemarks"><strong>Remarks:</strong> {{ c.adminRemarks }}</span>
+        <span *ngIf="!c.adminRemarks"><strong>Remarks:</strong> —</span>
+      </div>
+
+      <div class="complaint-footer">
+        <button type="button" class="btn-sm btn-ghost" (click)="toggleThread(c._id)">
+          {{ expandedId === c._id ? 'Hide discussion' : 'Discussion' }} ({{ c.comments.length }})
+        </button>
+        <button *ngIf="c.status === 'pending'" class="btn-danger btn-sm" (click)="deleteComplaint(c._id)">
+          Delete
+        </button>
+      </div>
+
+      <div class="thread-wrapper" *ngIf="expandedId === c._id">
+        <app-comment-thread
+          [comments]="c.comments"
+          [posting]="postingId === c._id"
+          (addComment)="onAddComment(c, $event)"
+        ></app-comment-thread>
+      </div>
+    </article>
+  </div>
+</div>

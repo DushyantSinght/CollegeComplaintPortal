@@ -1,0 +1,18 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>Student Dashboard</h2>
+      <p class="page-subtitle">Submit and track your complaints</p>
+    </div>
+  </div>
+
+  <div class="stat-cards-row" *ngIf="stats">
+    <app-stat-card [value]="stats.total" label="Total Filed"></app-stat-card>
+    <app-stat-card [value]="stats.byStatus.pending" label="Pending"></app-stat-card>
+    <app-stat-card [value]="stats.byStatus['in-progress']" label="In Progress"></app-stat-card>
+    <app-stat-card [value]="stats.byStatus.resolved" label="Resolved"></app-stat-card>
+  </div>
+
+  <app-complaint-form (created)="onComplaintCreated()"></app-complaint-form>
+  <app-complaint-list></app-complaint-list>
+</div>

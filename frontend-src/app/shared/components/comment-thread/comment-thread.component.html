@@ -1,0 +1,29 @@
+<div class="comment-thread">
+  <div class="comment-list" *ngIf="comments?.length; else noComments">
+    <div class="comment" *ngFor="let c of comments">
+      <div class="comment-head">
+        <span class="comment-author">{{ c.authorName }}</span>
+        <span [class]="'comment-role-badge role-' + c.authorRole">{{ c.authorRole }}</span>
+        <span class="comment-time">{{ c.createdAt | date: 'MMM d, h:mm a' }}</span>
+      </div>
+      <p class="comment-text">{{ c.text }}</p>
+    </div>
+  </div>
+  <ng-template #noComments>
+    <p class="muted comment-empty">No discussion yet — add the first note.</p>
+  </ng-template>
+
+  <form class="comment-form" (ngSubmit)="submit()">
+    <input
+      type="text"
+      class="form-control"
+      [(ngModel)]="draft"
+      name="commentDraft"
+      placeholder="Add a note..."
+      [disabled]="posting"
+    />
+    <button type="submit" class="btn-sm" [disabled]="!draft.trim() || posting">
+      {{ posting ? 'Posting...' : 'Post' }}
+    </button>
+  </form>
+</div>

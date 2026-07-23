@@ -1,0 +1,36 @@
+<div class="card">
+  <h3>Submit a Complaint</h3>
+  <form (ngSubmit)="onSubmit()" #form="ngForm">
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input id="title" type="text" name="title" [(ngModel)]="title" required class="form-control" placeholder="Brief summary of the issue" />
+    </div>
+    <div class="form-group">
+      <label for="category">Category</label>
+      <select id="category" name="category" [(ngModel)]="category" class="form-control">
+        <option value="hostel">Hostel</option>
+        <option value="academics">Academics</option>
+        <option value="facilities">Facilities</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="priority">Priority</label>
+      <select id="priority" name="priority" [(ngModel)]="priority" class="form-control">
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+        <option value="urgent">Urgent</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" name="description" [(ngModel)]="description" required rows="4" class="form-control" placeholder="Describe the issue in detail..."></textarea>
+    </div>
+    <p class="error" *ngIf="error">{{ error }}</p>
+    <p class="success" *ngIf="success">{{ success }}</p>
+    <button type="submit" [disabled]="!form.valid || loading">
+      {{ loading ? 'Submitting...' : 'Submit Complaint' }}
+    </button>
+  </form>
+</div>

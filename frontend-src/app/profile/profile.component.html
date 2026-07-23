@@ -1,0 +1,95 @@
+<div class="page profile-page">
+  <div class="page-header">
+    <div>
+      <h2>Profile</h2>
+      <p class="page-subtitle">Manage your account details and security</p>
+    </div>
+  </div>
+
+  <div class="profile-header card">
+    <div class="avatar-circle">{{ initials }}</div>
+    <div class="profile-header-info">
+      <h3>{{ auth.currentUser?.name }}</h3>
+      <p class="muted">{{ auth.currentUser?.email }}</p>
+      <span [class]="'role-badge role-' + auth.currentUser?.role">{{ auth.currentUser?.role }}</span>
+      <p class="muted member-since">Member since {{ memberSince }}</p>
+    </div>
+  </div>
+
+  <div class="profile-grid">
+    <div class="card">
+      <h3>Account Details</h3>
+      <form (ngSubmit)="saveProfile()" #profileForm="ngForm">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input id="name" type="text" name="name" [(ngModel)]="name" required class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input id="email" type="email" name="email" [(ngModel)]="email" required class="form-control" />
+        </div>
+        <div class="form-group" *ngIf="auth.currentUser?.role === 'student'">
+          <label for="studentId">Student ID</label>
+          <input id="studentId" type="text" name="studentId" [(ngModel)]="studentId" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="department">Department</label>
+          <input id="department" type="text" name="department" [(ngModel)]="department" class="form-control" />
+        </div>
+        <p class="error" *ngIf="profileError">{{ profileError }}</p>
+        <p class="success" *ngIf="profileSuccess">{{ profileSuccess }}</p>
+        <button type="submit" [disabled]="!profileForm.valid || profileLoading">
+          {{ profileLoading ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Change Password</h3>
+      <form (ngSubmit)="savePassword()" #passwordForm="ngForm">
+        <div class="form-group">
+          <label for="currentPassword">Current Password</label>
+          <input
+            id="currentPassword"
+            type="password"
+            name="currentPassword"
+            [(ngModel)]="currentPassword"
+            required
+            autocomplete="current-password"
+            class="form-control"
+          />
+        </div>
+        <div class="form-group">
+          <label for="newPassword">New Password</label>
+          <input
+            id="newPassword"
+            type="password"
+            name="newPassword"
+            [(ngModel)]="newPassword"
+            required
+            minlength="6"
+            autocomplete="new-password"
+            class="form-control"
+          />
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm New Password</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            name="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            required
+            autocomplete="new-password"
+            class="form-control"
+          />
+        </div>
+        <p class="error" *ngIf="passwordError">{{ passwordError }}</p>
+        <p class="success" *ngIf="passwordSuccess">{{ passwordSuccess }}</p>
+        <button type="submit" [disabled]="!passwordForm.valid || passwordLoading">
+          {{ passwordLoading ? 'Updating...' : 'Update Password' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
