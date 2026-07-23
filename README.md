@@ -26,7 +26,6 @@ email notification to the student.
 - Charts are hand-rolled SVG/CSS components — no charting library dependency
 
 ---
-
 ## 1. Backend Setup
 
 ```bash
