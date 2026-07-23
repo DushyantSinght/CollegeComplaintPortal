@@ -1,4 +1,4 @@
-# Student Complaint Portal — MEAN Stack Project
+# College Complaint Portal — MEAN Stack Project
 
 A role-based complaint management system for college campuses. Students file
 complaints (hostel, academics, facilities, other) with a priority level;
